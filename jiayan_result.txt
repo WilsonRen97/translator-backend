@@ -1,0 +1,7 @@
+===== Overall Evaluation =====
+Total Samples    : 1945
+Avg Char Accuracy : 0.975
+Avg Precision     : 0.719
+Avg Recall        : 0.719
+Avg F1 Score      : 0.718
+Processing time: 836.34 seconds
