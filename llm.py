@@ -4,7 +4,8 @@ from huggingface_hub import login
 from rag_db import retrieve_information
 from jiayan_token import tokenize_text
 
-login('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')
+# the following code is invalid
+# login('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')
 
 model_name = "meta-llama/Llama-3.2-1B-Instruct"
 model = AutoModelForCausalLM.from_pretrained(
