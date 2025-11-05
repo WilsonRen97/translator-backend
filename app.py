@@ -4,7 +4,8 @@ from flask_cors import CORS
 from translator import translate_classical_to_modern
 from jiayan_punc import punctuate
 from bert_punctuator_files.bert_punc_testing import predict_punctuation
-# from llm import rag_response
+from rag_db import retrieve_information
+from jiayan_token import tokenize_text
 
 app = Flask(__name__)
 CORS(app)
@@ -50,12 +51,18 @@ def translate():
     if not ancient_text:
         return jsonify({"error": "No text provided"}), 400
 
+    # tokenize ancient_text
+    keywords = tokenize_text(ancient_text)
+    print(f"Tokenized keywords: {keywords}")
+    info = retrieve_information(keywords)
+    print(f"Retrieved information: {info}")
+
     try:
         simplified_text = convert_to_simplified_chinese(ancient_text)
         modern_text = translate_classical_to_modern(simplified_text)
         traditional_text = convert_to_traditional_chinese(modern_text)
         print(f"Translated text: {traditional_text}")
-        return jsonify({"translation": traditional_text})
+        return jsonify({"translation": traditional_text, "retrieved_info": info})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
