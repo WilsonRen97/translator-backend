@@ -6,6 +6,7 @@ from jiayan_punc import punctuate
 from bert_punctuator_files.bert_punc_testing import predict_punctuation
 from rag_db import retrieve_information
 from jiayan_token import tokenize_text
+from dbscan_util import cluster_data
 
 app = Flask(__name__)
 CORS(app)
@@ -66,6 +67,15 @@ def translate():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@app.route("/jsonData", methods=["POST"])
+def json_data():
+    data = request.get_json()
+    listOfData = data['textObjects']
+    # example item in listOfData:
+    # {'id': 82, 'x': 1687, 'y': 1621, 'width': 44, 'height': 259, 'text': '子字孔桂', 'confidence': 0.766}
+    clustered_data = cluster_data(listOfData)
+    return jsonify({"status": "received", "data": clustered_data}), 200
 
 # @app.route("/rag", methods=["POST"])
 # def rag():
