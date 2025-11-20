@@ -7,6 +7,10 @@ from bert_punctuator_files.bert_punc_testing import predict_punctuation
 from rag_db import retrieve_information
 from jiayan_token import tokenize_text
 from dbscan_util import cluster_data
+import base64
+from PIL import Image
+import io
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -76,6 +80,36 @@ def json_data():
     # {'id': 82, 'x': 1687, 'y': 1621, 'width': 44, 'height': 259, 'text': '子字孔桂', 'confidence': 0.766}
     clustered_data = cluster_data(listOfData)
     return jsonify({"status": "received", "data": clustered_data}), 200
+
+
+@app.route('/uploadImage', methods=['POST'])
+def upload_image():
+    print("Received image upload request")
+    data = request.get_json()
+    image_data = data['image']
+    if ',' in image_data:
+        image_data = image_data.split(',')[1]
+    img_bytes = base64.b64decode(image_data)
+    img = Image.open(io.BytesIO(img_bytes))
+    # img.show()
+
+    # 傳送到另一台伺服器去做親子兄弟姐妹辨識
+    response = requests.post(
+        'http://127.0.0.1:7500/', json={'image': image_data})
+    if response.status_code != 200:
+        return jsonify({'error': 'Failed to process image on external server'}), 500
+    result = response.json()
+    # result has vertical_lines and horizontal_lines
+    vertical_lines = result.get('vertical_lines', [])
+    horizontal_lines = result.get('horizontal_lines', [])
+    # result has vertical_data and horizontal_box_connections
+    vertical_data = result.get('vertical_data', [])
+    horizontal_box_connections = result.get('horizontal_box_connections', [])
+    return jsonify({'status': 'ok',
+                    'vertical_lines': vertical_lines,
+                    'horizontal_lines': horizontal_lines,
+                    'vertical_data': vertical_data,
+                    'horizontal_box_connections': horizontal_box_connections}), 200
 
 # @app.route("/rag", methods=["POST"])
 # def rag():
