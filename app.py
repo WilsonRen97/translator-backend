@@ -105,11 +105,14 @@ def upload_image():
     # result has vertical_data and horizontal_box_connections
     vertical_data = result.get('vertical_data', [])
     horizontal_box_connections = result.get('horizontal_box_connections', [])
+    # results have all boxes too
+    boxes = result.get('boxes', [])
     return jsonify({'status': 'ok',
                     'vertical_lines': vertical_lines,
                     'horizontal_lines': horizontal_lines,
                     'vertical_data': vertical_data,
-                    'horizontal_box_connections': horizontal_box_connections}), 200
+                    'horizontal_box_connections': horizontal_box_connections,
+                    'boxes': boxes}), 200
 
 # @app.route("/rag", methods=["POST"])
 # def rag():
